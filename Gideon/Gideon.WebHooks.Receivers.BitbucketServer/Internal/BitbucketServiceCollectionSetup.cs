@@ -10,9 +10,9 @@ namespace Gideon.WebHooks.Receivers.BitbucketServer.Internal
     {
         public static void AddBitbucketServices(IServiceCollection services)
         {
-            if(services == null)
+            if (services == null)
             {
-                throw new ArgumentException(nameof(services));
+                throw new ArgumentNullException(nameof(services));
             }
 
             services.TryAddEnumerable(ServiceDescriptor.Singleton<IWebHookMetadata, BitbucketMetadata>());

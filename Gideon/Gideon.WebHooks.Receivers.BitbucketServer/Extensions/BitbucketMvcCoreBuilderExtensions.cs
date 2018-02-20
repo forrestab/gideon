@@ -8,7 +8,7 @@ namespace Gideon.WebHooks.Receivers.BitbucketServer.Extensions
     {
         public static IMvcCoreBuilder AddBitbucketWebHooks(this IMvcCoreBuilder builder)
         {
-            if(builder == null)
+            if (builder == null)
             {
                 throw new ArgumentNullException(nameof(builder));
             }
