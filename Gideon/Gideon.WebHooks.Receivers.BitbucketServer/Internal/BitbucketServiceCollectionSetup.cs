@@ -1,7 +1,11 @@
-﻿using Gideon.WebHooks.Receivers.BitbucketServer.Metadata;
+﻿using Gideon.WebHooks.Receivers.BitbucketServer.Filters;
+using Gideon.WebHooks.Receivers.BitbucketServer.Metadata;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebHooks.Filters;
 using Microsoft.AspNetCore.WebHooks.Metadata;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 using System;
 
 namespace Gideon.WebHooks.Receivers.BitbucketServer.Internal
@@ -15,7 +19,22 @@ namespace Gideon.WebHooks.Receivers.BitbucketServer.Internal
                 throw new ArgumentNullException(nameof(services));
             }
 
+            services.TryAddEnumerable(ServiceDescriptor.Transient<IConfigureOptions<MvcOptions>, MvcOptionsSetup>());
             services.TryAddEnumerable(ServiceDescriptor.Singleton<IWebHookMetadata, BitbucketMetadata>());
+            services.TryAddSingleton<BitbucketVerifySignatureFilter>();
+        }
+        
+        private class MvcOptionsSetup : IConfigureOptions<MvcOptions>
+        {
+            public void Configure(MvcOptions options)
+            {
+                if (options == null)
+                {
+                    throw new ArgumentNullException(nameof(options));
+                }
+
+                options.Filters.AddService<BitbucketVerifySignatureFilter>(WebHookSecurityFilter.Order);
+            }
         }
     }
 }
