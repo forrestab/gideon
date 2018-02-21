@@ -120,4 +120,7 @@
   <data name="General_ArgumentCannotBeNullOrEmpty" xml:space="preserve">
     <value>Value cannot be null or empty.</value>
   </data>
+  <data name="SignatureFilter_BadHeaderValue" xml:space="preserve">
+    <value>Invalid '{0}' header value. Expecting a value of '{1}={2}'.</value>
+  </data>
 </root>

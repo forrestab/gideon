@@ -68,5 +68,14 @@ namespace Gideon.WebHooks.Receivers.BitbucketServer.Properties {
                 return ResourceManager.GetString("General_ArgumentCannotBeNullOrEmpty", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid &apos;{0}&apos; header value. Expecting a value of &apos;{1}={2}&apos;..
+        /// </summary>
+        internal static string SignatureFilter_BadHeaderValue {
+            get {
+                return ResourceManager.GetString("SignatureFilter_BadHeaderValue", resourceCulture);
+            }
+        }
     }
 }

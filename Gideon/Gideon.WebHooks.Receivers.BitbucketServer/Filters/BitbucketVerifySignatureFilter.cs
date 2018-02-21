@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using Gideon.WebHooks.Receivers.BitbucketServer.Properties;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -9,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 using System;
+using System.Globalization;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -18,7 +20,7 @@ namespace Gideon.WebHooks.Receivers.BitbucketServer.Filters
     {
         public override string ReceiverName => BitbucketConstants.ReceiverName;
 
-        private static readonly char[] PAIR_SEPARATORS = new[] { '=' };
+        private static readonly char[] SEPARATORS = new[] { '=' };
 
         public BitbucketVerifySignatureFilter(IConfiguration configuration, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory)
             : base(configuration, hostingEnvironment, loggerFactory)
@@ -35,79 +37,88 @@ namespace Gideon.WebHooks.Receivers.BitbucketServer.Filters
             {
                 throw new ArgumentNullException(nameof(next));
             }
-
-            RouteData Data = context.RouteData;
-            HttpRequest Request = context.HttpContext.Request;
-
-            if(Data.TryGetWebHookReceiverName(out string ReceiverName) && this.IsApplicable(ReceiverName) && HttpMethods.IsPost(Request.Method))
+            
+            if (!this.IsRequestApplicable(context.RouteData) && HttpMethods.IsPost(context.HttpContext.Request.Method))
             {
-                // confirm secure connection
-                var ErrorResult = this.EnsureSecureConnection(ReceiverName, context.HttpContext.Request);
-                if(ErrorResult != null)
-                {
-                    context.Result = ErrorResult;
+                await next();
 
-                    return;
-                }
+                return;
+            }
 
-                // get the expected hash from signature header
-                var Header = this.GetRequestHeader(Request, BitbucketConstants.SignatureHeaderName, out ErrorResult);
-                if(ErrorResult != null)
-                {
-                    context.Result = ErrorResult;
+            IActionResult ErrorResult = base.EnsureSecureConnection(this.ReceiverName, context.HttpContext.Request);
+            if (ErrorResult != null)
+            {
+                context.Result = ErrorResult;
 
-                    return;
-                }
+                return;
+            }
+            
+            string Header = base.GetRequestHeader(context.HttpContext.Request, BitbucketConstants.SignatureHeaderName, out ErrorResult);
+            if (ErrorResult != null)
+            {
+                context.Result = ErrorResult;
 
-                var Values = new TrimmingTokenizer(Header, PAIR_SEPARATORS);
-                var Enumerator = Values.GetEnumerator();
+                return;
+            }
 
-                Enumerator.MoveNext();
+            TrimmingTokenizer Values = new TrimmingTokenizer(Header, SEPARATORS);
+            TrimmingTokenizer.Enumerator Enumerator = Values.GetEnumerator();
 
-                var HeaderKey = Enumerator.Current;
-                if(Values.Count != 2 || !StringSegment.Equals(HeaderKey, BitbucketConstants.SignatureHeaderKey, StringComparison.OrdinalIgnoreCase))
-                {
-                    // TODO, log
-                    // TODO, build message
-                    return;
-                }
+            Enumerator.MoveNext();
 
-                Enumerator.MoveNext();
-                var HeaderValue = Enumerator.Current.Value;
+            StringSegment HeaderKey = Enumerator.Current;
+            if (Values.Count != 2 || !StringSegment.Equals(HeaderKey, BitbucketConstants.SignatureHeaderKey, StringComparison.OrdinalIgnoreCase))
+            {
+                string ErrorMessage = string.Format(CultureInfo.CurrentCulture, Resources.SignatureFilter_BadHeaderValue,
+                    BitbucketConstants.SignatureHeaderName, BitbucketConstants.SignatureHeaderKey, "<value>");
 
-                var ExpectedHash = this.FromHex(HeaderValue, BitbucketConstants.SignatureHeaderName);
-                if(ExpectedHash == null)
-                {
-                    context.Result = this.CreateBadHexEncodingResult(BitbucketConstants.SignatureHeaderName);
+                base.Logger.LogError(1, ErrorMessage);
+                context.Result = new BadRequestObjectResult(ErrorMessage);
 
-                    return;
-                }
+                return;
+            }
 
-                // get the configured secret key
-                var SecretKey = this.GetSecretKey(ReceiverName, Data, 0, 255);
-                if(SecretKey == null)
-                {
-                    context.Result = new NotFoundResult();
+            Enumerator.MoveNext();
+            string HeaderValue = Enumerator.Current.Value;
 
-                    return;
-                }
+            byte[] ExpectedHash = base.FromHex(HeaderValue, BitbucketConstants.SignatureHeaderName);
+            if (ExpectedHash == null)
+            {
+                context.Result = base.CreateBadHexEncodingResult(BitbucketConstants.SignatureHeaderName);
 
-                var Secret = Encoding.UTF8.GetBytes(SecretKey);
+                return;
+            }
+            
+            byte[] Secret = this.GetSecret(this.ReceiverName, context.RouteData);
+            if (Secret == null)
+            {
+                context.Result = new NotFoundResult();
 
-                // get the actual hash of the request body
-                var ActualHash = await this.ComputeRequestBodySha256HashAsync(Request, Secret);
+                return;
+            }
+            
+            byte[] ActualHash = await base.ComputeRequestBodySha256HashAsync(context.HttpContext.Request, Secret);
+            if (!BitbucketVerifySignatureFilter.SecretEqual(ExpectedHash, ActualHash))
+            {
+                context.Result = base.CreateBadSignatureResult(BitbucketConstants.SignatureHeaderName);
 
-                // verify that the actual hash matches the expected hash
-                if (!SecretEqual(ExpectedHash, ActualHash))
-                {
-                    ErrorResult = this.CreateBadSignatureResult(BitbucketConstants.SignatureHeaderName);
-                    context.Result = ErrorResult;
-
-                    return;
-                }
+                return;
             }
 
             await next();
+        }
+
+        private bool IsRequestApplicable(RouteData routeData)
+        {
+            return routeData.TryGetWebHookReceiverName(out string RequestReceiverName) && this.IsApplicable(RequestReceiverName);
+        }
+
+        private byte[] GetSecret(string receiverName, RouteData routeData)
+        {
+            string SecretKey = base.GetSecretKey(receiverName, routeData, 
+                BitbucketConstants.SecretKeyMinLength, BitbucketConstants.SecretKeyMaxLength);
+
+            return SecretKey != null ? Encoding.UTF8.GetBytes(SecretKey) : null;
         }
     }
 }
