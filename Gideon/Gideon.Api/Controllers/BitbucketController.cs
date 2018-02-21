@@ -16,7 +16,7 @@ namespace Gideon.Api.Controllers
         }
 
         [BitbucketWebHook(EventName = "pr:opened")]
-        public async Task<IActionResult> PullRequestOpened(string @event, JObject data)
+        public async Task<IActionResult> PullRequestOpened(string @event, string requestId, JObject data)
         {
             if (!ModelState.IsValid)
             {
@@ -29,7 +29,7 @@ namespace Gideon.Api.Controllers
         }
 
         [BitbucketWebHook]
-        public async Task<IActionResult> FallbackHandler(string receiverName, string id, string eventName, JObject data)
+        public async Task<IActionResult> FallbackHandler(string receiverName, string eventName, string requestId, JObject data)
         {
             return this.Ok();
         }
