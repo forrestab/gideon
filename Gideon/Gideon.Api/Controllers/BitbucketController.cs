@@ -1,16 +1,37 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Gideon.WebHooks.Receivers.BitbucketServer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
+using System.Threading.Tasks;
 
 namespace Gideon.Api.Controllers
 {
-    [Route("api/[controller]")]
-    public class BitbucketController : Controller
+    public class BitbucketController : ControllerBase
     {
         private readonly ILogger logger;
 
         public BitbucketController(ILoggerFactory loggerFactory)
         {
             this.logger = loggerFactory.CreateLogger<BitbucketController>();
+        }
+
+        [BitbucketWebHook(EventName = "pr:opened")]
+        public async Task<IActionResult> PullRequestOpened(string @event, string requestId, JObject data)
+        {
+            if (!ModelState.IsValid)
+            {
+                return this.BadRequest(ModelState);
+            }
+
+            this.logger.LogInformation("{ControllerName} received '{EventName}'.", nameof(BitbucketController), @event);
+
+            return this.Ok();
+        }
+
+        [BitbucketWebHook]
+        public async Task<IActionResult> FallbackHandler(string receiverName, string eventName, string requestId, JObject data)
+        {
+            return this.Ok();
         }
     }
 }
