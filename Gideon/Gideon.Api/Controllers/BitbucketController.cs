@@ -1,4 +1,5 @@
 ﻿using Gideon.WebHooks.Receivers.BitbucketServer;
+using Gideon.WebHooks.Receivers.BitbucketServer.Models.Notifications;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
@@ -16,7 +17,7 @@ namespace Gideon.Api.Controllers
         }
 
         [BitbucketWebHook(EventName = "pr:opened")]
-        public async Task<IActionResult> PullRequestOpened(string @event, string requestId, JObject data)
+        public async Task<IActionResult> PullRequestOpened(string @event, string requestId, PullRequestOpenedNotification data)
         {
             if (!ModelState.IsValid)
             {
