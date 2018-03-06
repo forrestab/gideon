@@ -1,5 +1,6 @@
 ﻿using Gideon.WebHooks.Receivers.BitbucketServer.Models.Enums;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
 
@@ -21,6 +22,7 @@ namespace Gideon.WebHooks.Receivers.BitbucketServer.Models
         public string Description { get; set; }
 
         [JsonProperty("state")]
+        [JsonConverter(typeof(StringEnumConverter))]
         public BitbucketPullRequestState State { get; set; }
 
         [JsonProperty("open")]

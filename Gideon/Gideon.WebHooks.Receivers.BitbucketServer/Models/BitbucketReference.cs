@@ -1,5 +1,6 @@
 ﻿using Gideon.WebHooks.Receivers.BitbucketServer.Models.Enums;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Gideon.WebHooks.Receivers.BitbucketServer.Models
 {
@@ -21,6 +22,7 @@ namespace Gideon.WebHooks.Receivers.BitbucketServer.Models
 
         // TODO, check if in all objects
         [JsonProperty("type")]
+        [JsonConverter(typeof(StringEnumConverter))]
         public BitbucketReferenceType ReferenceType { get; set; }
     }
 }

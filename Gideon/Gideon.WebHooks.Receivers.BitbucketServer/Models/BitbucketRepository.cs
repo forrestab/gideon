@@ -1,5 +1,6 @@
 ﻿using Gideon.WebHooks.Receivers.BitbucketServer.Models.Enums;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Gideon.WebHooks.Receivers.BitbucketServer.Models
 {
@@ -18,6 +19,7 @@ namespace Gideon.WebHooks.Receivers.BitbucketServer.Models
         public string Scm { get; set; }
 
         [JsonProperty("state")]
+        [JsonConverter(typeof(StringEnumConverter))]
         public BitbucketRepositoryState State { get; set; }
 
         [JsonProperty("statusMessage")]
