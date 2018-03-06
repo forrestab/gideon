@@ -1,4 +1,5 @@
-﻿using Gideon.WebHooks.Receivers.BitbucketServer.Models.Enums;
+﻿using Gideon.WebHooks.Receivers.BitbucketServer.Models.Converters;
+using Gideon.WebHooks.Receivers.BitbucketServer.Models.Enums;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System;
@@ -32,14 +33,16 @@ namespace Gideon.WebHooks.Receivers.BitbucketServer.Models
         public bool IsClosed { get; set; }
 
         [JsonProperty("createdDate")]
-        public DateTime CreatedDate { get; set; }
+        [JsonConverter(typeof(UnixDateTimeMillisecondsConverter))]
+        public DateTimeOffset CreatedDate { get; set; }
 
         [JsonProperty("updatedDate")]
-        public DateTime UpdatedDate { get; set; }
+        [JsonConverter(typeof(UnixDateTimeMillisecondsConverter))]
+        public DateTimeOffset UpdatedDate { get; set; }
 
-        // TODO, check if in all objects
         [JsonProperty("closedDate")]
-        public DateTime ClosedDate { get; set; }
+        [JsonConverter(typeof(UnixDateTimeMillisecondsConverter))]
+        public DateTimeOffset? ClosedDate { get; set; }
 
         [JsonProperty("fromRef")]
         public BitbucketReference FromReference { get; set; }

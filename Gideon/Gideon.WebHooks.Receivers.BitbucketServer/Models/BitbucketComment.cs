@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Gideon.WebHooks.Receivers.BitbucketServer.Models.Converters;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -24,10 +25,12 @@ namespace Gideon.WebHooks.Receivers.BitbucketServer.Models
         public BitbucketUser Author { get; set; }
 
         [JsonProperty("createdDate")]
-        public DateTime CreatedDate { get; set; }
+        [JsonConverter(typeof(UnixDateTimeMillisecondsConverter))]
+        public DateTimeOffset CreatedDate { get; set; }
 
         [JsonProperty("updatedDate")]
-        public DateTime UpdatedDate { get; set; }
+        [JsonConverter(typeof(UnixDateTimeMillisecondsConverter))]
+        public DateTimeOffset UpdatedDate { get; set; }
 
         // TODO, create actual comment object
         [JsonProperty("comments")]

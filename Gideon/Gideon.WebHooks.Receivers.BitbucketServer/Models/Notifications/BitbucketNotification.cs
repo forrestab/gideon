@@ -9,7 +9,7 @@ namespace Gideon.WebHooks.Receivers.BitbucketServer.Models.Notifications
         public string EventKey { get; set; }
 
         [JsonProperty("date")]
-        public DateTime Date { get; set; }
+        public DateTimeOffset Date { get; set; }
 
         [JsonProperty("actor")]
         public BitbucketUser Actor { get; set; }
