@@ -1,9 +1,9 @@
-﻿using Gideon.WebHooks.Receivers.BitbucketServer;
+﻿using Gideon.Api.Services;
+using Gideon.WebHooks.Receivers.BitbucketServer;
 using Gideon.WebHooks.Receivers.BitbucketServer.Events;
 using Gideon.WebHooks.Receivers.BitbucketServer.Models.Notifications;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 
 namespace Gideon.Api.Controllers
@@ -11,10 +11,12 @@ namespace Gideon.Api.Controllers
     public class BitbucketController : ControllerBase
     {
         private readonly ILogger logger;
+        private readonly IPullRequestService pullRequestService;
 
-        public BitbucketController(ILoggerFactory loggerFactory)
+        public BitbucketController(ILoggerFactory loggerFactory, IPullRequestService pullRequestService)
         {
             this.logger = loggerFactory.CreateLogger<BitbucketController>();
+            this.pullRequestService = pullRequestService;
         }
 
         [BitbucketWebHook(EventName = BitbucketPullRequestEvent.OPENED)]
@@ -25,14 +27,8 @@ namespace Gideon.Api.Controllers
                 return this.BadRequest(ModelState);
             }
 
-            this.logger.LogInformation("{ControllerName} received '{EventName}'.", nameof(BitbucketController), @event);
+            await this.pullRequestService.OnOpenedHandlerAsync(data);
 
-            return this.Ok();
-        }
-
-        [BitbucketWebHook]
-        public async Task<IActionResult> FallbackHandler(string receiverName, string eventName, string requestId, JObject data)
-        {
             return this.Ok();
         }
     }
