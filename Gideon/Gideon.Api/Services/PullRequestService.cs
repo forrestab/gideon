@@ -41,9 +41,15 @@ namespace Gideon.Api.Services
             if (!this.IsReviewer(notification.PullRequest.Reviewers))
             {
                 // add the bot as a reviewer
-                await this.bitbucketClient.AddReviewer(notification.PullRequest.ToReference.Repository.Project.Key,
-                    notification.PullRequest.ToReference.Repository.Slug, notification.PullRequest.Id, "gideonbot", 
-                    BitbucketRole.Reviewer);
+                await this.bitbucketClient.AddReviewer(notification.PullRequest, new BitbucketParticipant()
+                {
+                    User = new BitbucketUser()
+                    {
+                        // TODO, pull this from configuration
+                        Name = "gideonbot"
+                    },
+                    Role = BitbucketRole.Reviewer
+                });
             }
         }
 

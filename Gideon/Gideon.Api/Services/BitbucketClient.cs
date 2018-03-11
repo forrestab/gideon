@@ -1,10 +1,6 @@
-﻿using Gideon.Api.Models;
+﻿using Gideon.Api.Http;
 using Gideon.WebHooks.Receivers.BitbucketServer.Models;
-using Gideon.WebHooks.Receivers.BitbucketServer.Models.Enums;
-using Newtonsoft.Json;
-using System;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Gideon.Api.Services
@@ -18,19 +14,18 @@ namespace Gideon.Api.Services
             this.client = client;
         }
 
-        public async Task AddReviewer(string projectKey, string repositorySlug, long pullRequestId, string reviewerName, BitbucketRole role)
+        public async Task<HttpResponseMessage> AddReviewer(BitbucketPullRequest pullRequest, BitbucketParticipant reviewer)
         {
-            string UriFragment = $"projects/{projectKey}/repos/{repositorySlug}/pull-requests/{pullRequestId}/participants";
-            string Json = JsonConvert.SerializeObject(new NewReviewer()
-            {
-                User = new BitbucketUser()
-                {
-                    Name = reviewerName
-                },
-                Role = role
-            });
+            return await this.AddReviewer(pullRequest.ToReference.Repository.Project.Key, pullRequest.ToReference.Repository.Slug,
+                pullRequest.Id, reviewer);
+        }
 
-            HttpResponseMessage Response = await this.client.PostAsync(UriFragment, new StringContent(Json, Encoding.UTF8, "application/json"));
+        public async Task<HttpResponseMessage> AddReviewer(string projectKey, string repositorySlug, long pullRequestId, 
+            BitbucketParticipant reviewer)
+        {
+            string UriPath = $"projects/{projectKey}/repos/{repositorySlug}/pull-requests/{pullRequestId}/participants";
+
+            return await this.client.PostAsync(UriPath, new JsonContent<BitbucketParticipant>(reviewer));
         }
     }
 }
