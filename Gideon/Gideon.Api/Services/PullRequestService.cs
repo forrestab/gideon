@@ -1,4 +1,5 @@
-﻿using Gideon.WebHooks.Receivers.BitbucketServer.Models;
+﻿using Gideon.Api.Models;
+using Gideon.WebHooks.Receivers.BitbucketServer.Models;
 using Gideon.WebHooks.Receivers.BitbucketServer.Models.Enums;
 using Gideon.WebHooks.Receivers.BitbucketServer.Models.Notifications;
 using System;
@@ -25,10 +26,10 @@ namespace Gideon.Api.Services
 
             await this.AddBotAsReviewer(notification);
 
-            if (this.HasMergeConflicts())
+            if (await this.HasMergeConflicts(notification.PullRequest))
             {
                 // update the pr with needs_work
-                // comment with, please fix merge conflicts
+                // comment with, please fix merge conflicts and add steps for fix
 
                 return;
             }
@@ -62,9 +63,12 @@ namespace Gideon.Api.Services
             });
         }
 
-        private bool HasMergeConflicts()
+        private async Task<bool> HasMergeConflicts(BitbucketPullRequest pullRequest)
         {
-            return false;
+            BitbucketMergeStatus Response = await this.bitbucketClient.TestMerge(pullRequest);
+
+            // TODO, may need to handle vetos
+            return Response.IsConflicted;
         }
     }
 }
