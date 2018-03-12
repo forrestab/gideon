@@ -16,18 +16,46 @@ namespace Gideon.Api.Services
             this.client = client;
         }
 
+        public async Task<HttpResponseMessage> AddComent(BitbucketPullRequest pullRequest, BitbucketComment comment)
+        {
+            return await this.AddComent(pullRequest.ToReference.Repository.Project.Key, pullRequest.ToReference.Repository.Slug,
+                pullRequest.Id, comment);
+        }
+
+        public async Task<HttpResponseMessage> AddComent(string projectKey, string repositorySlug, long pullRequestId, 
+            BitbucketComment comment)
+        {
+            string UriPath = $"projects/{projectKey}/repos/{repositorySlug}/pull-requests/{pullRequestId}/comments";
+
+            return await this.client.PostAsync(UriPath, new JsonContent<BitbucketComment>(comment));
+        }
+
         public async Task<HttpResponseMessage> AddReviewer(BitbucketPullRequest pullRequest, BitbucketParticipant reviewer)
         {
             return await this.AddReviewer(pullRequest.ToReference.Repository.Project.Key, pullRequest.ToReference.Repository.Slug,
                 pullRequest.Id, reviewer);
         }
 
-        public async Task<HttpResponseMessage> AddReviewer(string projectKey, string repositorySlug, long pullRequestId, 
+        public async Task<HttpResponseMessage> AddReviewer(string projectKey, string repositorySlug, long pullRequestId,
             BitbucketParticipant reviewer)
         {
             string UriPath = $"projects/{projectKey}/repos/{repositorySlug}/pull-requests/{pullRequestId}/participants";
 
             return await this.client.PostAsync(UriPath, new JsonContent<BitbucketParticipant>(reviewer));
+        }
+
+        public async Task<HttpResponseMessage> SetReviewerStatus(BitbucketPullRequest pullRequest, BitbucketParticipant reviewer)
+        {
+            return await this.SetReviewerStatus(pullRequest.ToReference.Repository.Project.Key, pullRequest.ToReference.Repository.Slug,
+                pullRequest.Id, reviewer);
+        }
+
+        public async Task<HttpResponseMessage> SetReviewerStatus(string projectKey, string repositorySlug, long pullRequestId,
+            BitbucketParticipant reviewer)
+        {
+            string UriPath = $"projects/{projectKey}/repos/{repositorySlug}/pull-requests/{pullRequestId}/participants/{reviewer.User.Slug}";
+
+            return await this.client.PutAsync(UriPath, new JsonContent<BitbucketParticipant>(reviewer));
         }
 
         public async Task<BitbucketMergeStatus> TestMerge(BitbucketPullRequest pullRequest)

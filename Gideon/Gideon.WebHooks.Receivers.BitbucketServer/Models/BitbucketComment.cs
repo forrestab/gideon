@@ -26,11 +26,11 @@ namespace Gideon.WebHooks.Receivers.BitbucketServer.Models
 
         [JsonProperty("createdDate")]
         [JsonConverter(typeof(UnixDateTimeMillisecondsConverter))]
-        public DateTimeOffset CreatedDate { get; set; }
+        public DateTimeOffset? CreatedDate { get; set; }
 
         [JsonProperty("updatedDate")]
         [JsonConverter(typeof(UnixDateTimeMillisecondsConverter))]
-        public DateTimeOffset UpdatedDate { get; set; }
+        public DateTimeOffset? UpdatedDate { get; set; }
 
         // TODO, create actual comment object
         [JsonProperty("comments")]

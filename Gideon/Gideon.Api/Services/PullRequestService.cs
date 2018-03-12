@@ -29,7 +29,23 @@ namespace Gideon.Api.Services
             if (await this.HasMergeConflicts(notification.PullRequest))
             {
                 // update the pr with needs_work
+                await this.bitbucketClient.SetReviewerStatus(notification.PullRequest, new BitbucketParticipant()
+                {
+                    User = new BitbucketUser()
+                    {
+                        // TODO, pull this from configuration
+                        Name = "gideonbot",
+                        Slug = "gideonbot"
+                    },
+                    IsApproved = false,
+                    Status = BitbucketStatus.NeedsWork
+                });
                 // comment with, please fix merge conflicts and add steps for fix
+                await this.bitbucketClient.AddComent(notification.PullRequest, new BitbucketComment()
+                {
+                    // TODO, pull this from resources and add better message
+                    Text = "Please fix the merge conflicts."
+                });
 
                 return;
             }
