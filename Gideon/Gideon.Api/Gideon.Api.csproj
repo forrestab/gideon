@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore" Version="2.1.0-preview2-30143" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="2.1.0-preview2-30263" />
   </ItemGroup>
 
   <ItemGroup>
