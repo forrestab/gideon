@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Net.Http;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Gideon.Api.Http
 {
@@ -11,7 +12,10 @@ namespace Gideon.Api.Http
         { }
 
         public JsonContent(T content, Encoding encoding)
-            : base(JsonConvert.SerializeObject(content), encoding, "application/json")
+            // Looks like `string.Format` is escaping the newline character which makes it not render
+            // correctly in Bitbucket.
+            // https://stackoverflow.com/questions/11101359/how-to-prevent-c-sharp-from-escaping-my-string
+            : base(Regex.Unescape(JsonConvert.SerializeObject(content)), encoding, "application/json")
         { }
     }
 }
