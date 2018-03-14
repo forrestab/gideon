@@ -1,6 +1,7 @@
 ﻿using Gideon.Api.Integrations;
 using Gideon.Api.Models;
 using Gideon.Api.Properties;
+using Gideon.Api.Utilities;
 using Gideon.WebHooks.Receivers.BitbucketServer.Models;
 using Gideon.WebHooks.Receivers.BitbucketServer.Models.Enums;
 using Gideon.WebHooks.Receivers.BitbucketServer.Models.Notifications;
@@ -21,10 +22,7 @@ namespace Gideon.Api.Services
 
         public async Task OnOpenedHandlerAsync(PullRequestOpenedNotification notification)
         {
-            if (notification == null)
-            {
-                throw new ArgumentNullException(nameof(notification));
-            }
+            Guard.AgainstNullArgument<PullRequestOpenedNotification>(nameof(notification), notification);
 
             await this.AddBotAsReviewer(notification);
 
