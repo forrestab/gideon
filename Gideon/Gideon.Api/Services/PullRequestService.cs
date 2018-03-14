@@ -1,4 +1,5 @@
-﻿using Gideon.Api.Models;
+﻿using Gideon.Api.Integrations;
+using Gideon.Api.Models;
 using Gideon.Api.Properties;
 using Gideon.WebHooks.Receivers.BitbucketServer.Models;
 using Gideon.WebHooks.Receivers.BitbucketServer.Models.Enums;
@@ -42,7 +43,7 @@ namespace Gideon.Api.Services
                     Status = BitbucketStatus.NeedsWork
                 });
                 // comment with, please fix merge conflicts and add steps for fix
-                await this.bitbucketClient.AddComent(notification.PullRequest, new BitbucketComment()
+                await this.bitbucketClient.AddComment(notification.PullRequest, new BitbucketComment()
                 {
                     Text = string.Format(Resources.PullRequest_MergeConflictResolution, notification.PullRequest.ToReference.DisplayName,
                         notification.PullRequest.FromReference.DisplayName)

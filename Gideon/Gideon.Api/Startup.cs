@@ -1,4 +1,5 @@
-﻿using Gideon.Api.Services;
+﻿using Gideon.Api.Integrations;
+using Gideon.Api.Services;
 using Gideon.WebHooks.Receivers.BitbucketServer.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -25,7 +26,7 @@ namespace Gideon.Api
                 .AddMvcCore()
                 .AddBitbucketWebHooks();
 
-            services.AddHttpClient<IBitbucketClient, BitbucketClient>(client =>
+            services.AddHttpClient<IAtlassianClient, AtlassianClient>(client =>
             {
                 // TODO, pull address from configuration
                 client.BaseAddress = new Uri("http://localhost:7990/rest/api/1.0/");
@@ -34,6 +35,7 @@ namespace Gideon.Api
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
             });
 
+            services.AddTransient<IBitbucketClient, BitbucketClient>();
             services.AddScoped<IPullRequestService, PullRequestService>();
         }
 

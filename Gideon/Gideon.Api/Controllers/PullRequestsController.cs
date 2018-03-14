@@ -8,14 +8,14 @@ using System.Threading.Tasks;
 
 namespace Gideon.Api.Controllers
 {
-    public class BitbucketController : ControllerBase
+    public class PullRequestsController : ControllerBase
     {
         private readonly ILogger logger;
         private readonly IPullRequestService pullRequestService;
 
-        public BitbucketController(ILoggerFactory loggerFactory, IPullRequestService pullRequestService)
+        public PullRequestsController(ILoggerFactory loggerFactory, IPullRequestService pullRequestService)
         {
-            this.logger = loggerFactory.CreateLogger<BitbucketController>();
+            this.logger = loggerFactory.CreateLogger<PullRequestsController>();
             this.pullRequestService = pullRequestService;
         }
 
