@@ -1,4 +1,5 @@
 ﻿using Gideon.Api.Models;
+using Gideon.Api.Properties;
 using Gideon.WebHooks.Receivers.BitbucketServer.Models;
 using Gideon.WebHooks.Receivers.BitbucketServer.Models.Enums;
 using Gideon.WebHooks.Receivers.BitbucketServer.Models.Notifications;
@@ -43,8 +44,8 @@ namespace Gideon.Api.Services
                 // comment with, please fix merge conflicts and add steps for fix
                 await this.bitbucketClient.AddComent(notification.PullRequest, new BitbucketComment()
                 {
-                    // TODO, pull this from resources and add better message
-                    Text = "Please fix the merge conflicts."
+                    Text = string.Format(Resources.PullRequest_MergeConflictResolution, notification.PullRequest.ToReference.DisplayName,
+                        notification.PullRequest.FromReference.DisplayName)
                 });
 
                 return;
