@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2036
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Isac.WebHooks.Receivers.BitbucketServer", "Isac.WebHooks.Receivers.BitbucketServer\Isac.WebHooks.Receivers.BitbucketServer.csproj", "{A77D90C9-4851-482F-8657-C3923143A77E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Isac.Api", "Isac.Api\Isac.Api.csproj", "{8B9FEB03-20BA-4C38-B6B3-BFBD3C15D10E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A77D90C9-4851-482F-8657-C3923143A77E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A77D90C9-4851-482F-8657-C3923143A77E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A77D90C9-4851-482F-8657-C3923143A77E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A77D90C9-4851-482F-8657-C3923143A77E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B9FEB03-20BA-4C38-B6B3-BFBD3C15D10E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B9FEB03-20BA-4C38-B6B3-BFBD3C15D10E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B9FEB03-20BA-4C38-B6B3-BFBD3C15D10E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B9FEB03-20BA-4C38-B6B3-BFBD3C15D10E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2E605624-FE5E-4B6B-9E1C-4EF7D52B8845}
+	EndGlobalSection
+EndGlobal

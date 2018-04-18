@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore" Version="2.1.0-preview2-30143" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="2.1.0-preview2-30263" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Isac.WebHooks.Receivers.BitbucketServer\Isac.WebHooks.Receivers.BitbucketServer.csproj" />
+  </ItemGroup>
+
+</Project>
