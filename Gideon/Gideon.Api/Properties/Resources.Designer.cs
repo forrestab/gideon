@@ -61,6 +61,15 @@ namespace Gideon.Api.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The following commits are not associated with a reveiw:\n\n{0}.
+        /// </summary>
+        internal static string PullRequest_CommitsNotAssociatedWithAReview {
+            get {
+                return ResourceManager.GetString("PullRequest_CommitsNotAssociatedWithAReview", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This pull request contains conflicts, please follow the below steps to resolve them.\n\n**Step 1.** Make sure `{0}` is updated locally.\n\n```sh\ngit checkout {0}\ngit pull\n```\n\n**Step 2.** Checkout `{1}` and pull `{0}` in locally. This will try to merge and will reveal all of the conflicts.\n\n```sh\ngit checkout {1}\ngit pull origin {0}\n```\n\n**Step 3.** Resolve conflicts, add and commit the changes and push them to remote.\n\n```sh\ngit add &lt;files&gt;\ngit commit -m &apos;commit message&apos;\ngit push origin {1 [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string PullRequest_MergeConflictResolution {

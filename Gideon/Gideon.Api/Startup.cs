@@ -27,7 +27,6 @@ namespace Gideon.Api
             services.AddBitbucketClient();
             services.AddFishEyeClient();
 
-            services.AddTransient<IBitbucketClient, BitbucketClient>();
             services.AddScoped<IPullRequestService, PullRequestService>();
         }
 

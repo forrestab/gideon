@@ -1,23 +1,26 @@
 ﻿using Gideon.Api.Integrations;
 using Gideon.Api.Models;
+using Gideon.Api.Models.FishEye;
 using Gideon.Api.Properties;
 using Gideon.Api.Utilities;
 using Gideon.WebHooks.Receivers.BitbucketServer.Models;
 using Gideon.WebHooks.Receivers.BitbucketServer.Models.Enums;
 using Gideon.WebHooks.Receivers.BitbucketServer.Models.Notifications;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace Gideon.Api.Services
 {
     public class PullRequestService : IPullRequestService
     {
         private readonly IBitbucketClient bitbucketClient;
+        private readonly IFishEyeClient fishEyeClient;
 
-        public PullRequestService(IBitbucketClient bitbucketClient)
+        public PullRequestService(IBitbucketClient bitbucketClient, IFishEyeClient fishEyeClient)
         {
             this.bitbucketClient = bitbucketClient;
+            this.fishEyeClient = fishEyeClient;
         }
 
         public async Task OnOpenedHandlerAsync(PullRequestOpenedNotification notification)
@@ -47,10 +50,11 @@ namespace Gideon.Api.Services
                         notification.PullRequest.FromReference.DisplayName)
                 });
 
-                return;
+                //return;
             }
 
             // check other criteria
+            await this.AreAllCommitsReviewed(notification.PullRequest);
         }
 
         private async Task AddBotAsReviewer(PullRequestOpenedNotification notification)
@@ -85,6 +89,34 @@ namespace Gideon.Api.Services
 
             // TODO, may need to handle vetos
             return Response.IsConflicted;
+        }
+
+        private async Task<bool> AreAllCommitsReviewed(BitbucketPullRequest pullRequest)
+        {
+            BitbucketPageResponse<BitbucketPullRequestCommit> Response = await this.bitbucketClient.GetCommits(pullRequest);
+            FishEyeChangesets Changesets;
+
+            if (Response.Values.Count <= 0)
+            {
+                return true;
+            }
+
+            Changesets = await this.fishEyeClient.GetReviewsForChangesets(pullRequest.FromReference.Repository.Slug, 
+                Response.Values.Select(s => s.Id).ToList());
+
+            List<FishEyeChangeset> ChangesetsMissingReviews = Changesets.Changesets.FindAll(c => c.Reviews.Count <= 0);
+
+            if (ChangesetsMissingReviews.Count > 0)
+            {
+                // List commits that are not associated with a review
+                await this.bitbucketClient.AddComment(pullRequest, new BitbucketComment()
+                {
+                    Text = string.Format(Resources.PullRequest_CommitsNotAssociatedWithAReview, 
+                        string.Join("\n", ChangesetsMissingReviews.Select(s => $"* {s.ChangesetId}")))
+                });
+            }
+
+            return false;
         }
     }
 }

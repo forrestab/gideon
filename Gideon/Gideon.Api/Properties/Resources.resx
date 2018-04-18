@@ -117,8 +117,12 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="PullRequest_CommitsNotAssociatedWithAReview" xml:space="preserve">
+    <value>The following commits are not associated with a reveiw:\n\n{0}</value>
+    <comment>0 = list of commit ids</comment>
+  </data>
   <data name="PullRequest_MergeConflictResolution" xml:space="preserve">
-    <value>This pull request contains conflicts, please follow the below steps to resolve them.\n\n**Step 1.** Make sure `{0}` is updated locally.\n\n```sh\ngit checkout {0}\ngit pull\n```\n\n**Step 2.** Checkout `{1}` and pull `{0}` in locally. This will try to merge and will reveal all of the conflicts.\n\n```sh\ngit checkout {1}\ngit pull origin {0}\n```\n\n**Step 3.** Resolve conflicts, add and commit the changes and push them to remote.\n\n```sh\ngit add &lt;files&gt;\ngit commit -m 'commit message'\ngit push origin {1}\n```\n\nChecking the pull request, you should see that it still open with no merge conflicts.</value>
+    <value>This pull request contains conflicts, please follow the below steps to resolve them.\n\n**Step 1.** Make sure `{0}` is updated locally.\n\n```sh\ngit checkout {0}\ngit pull\n```\n\n**Step 2.** Checkout `{1}` and pull `{0}` in locally. This will try to merge and will reveal all of the conflicts.\n\n```sh\ngit checkout {1}\ngit pull origin {0}\n```\n\n**Step 3.** Resolve conflicts, add and commit the changes and push them to remote.\n\n```sh\ngit add &lt;files&gt;\ngit commit -m 'commit message'\ngit push origin {1}\n```\n\nChecking the pull request, you should see that its still open with no merge conflicts.</value>
     <comment>0 = destination, 1 = source</comment>
   </data>
 </root>
