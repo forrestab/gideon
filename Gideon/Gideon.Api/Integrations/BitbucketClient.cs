@@ -9,11 +9,11 @@ namespace Gideon.Api.Integrations
 {
     public class BitbucketClient : IBitbucketClient
     {
-        private readonly IAtlassianClient atlassianClient;
+        private readonly HttpClient client;
 
-        public BitbucketClient(IAtlassianClient atlassianClient)
+        public BitbucketClient(HttpClient client)
         {
-            this.atlassianClient = atlassianClient;
+            this.client = client;
         }
 
         public async Task<HttpResponseMessage> AddComment(BitbucketPullRequest pullRequest, BitbucketComment comment)
@@ -21,8 +21,8 @@ namespace Gideon.Api.Integrations
             Guard.AgainstNullArgument<BitbucketComment>(nameof(comment), comment);
 
             string RequestUri = $"{this.GetBaseUri(pullRequest)}/comments";
-
-            return await this.atlassianClient.Client.PostAsync(RequestUri, new JsonContent<BitbucketComment>(comment));
+            
+            return await this.client.PostAsync(RequestUri, new JsonContent<BitbucketComment>(comment));
         }
 
         public async Task<HttpResponseMessage> AddReviewer(BitbucketPullRequest pullRequest, BitbucketParticipant reviewer)
@@ -31,7 +31,14 @@ namespace Gideon.Api.Integrations
 
             string RequestUri = $"{this.GetBaseUri(pullRequest)}/participants";
 
-            return await this.atlassianClient.Client.PostAsync(RequestUri, new JsonContent<BitbucketParticipant>(reviewer));
+            return await this.client.PostAsync(RequestUri, new JsonContent<BitbucketParticipant>(reviewer));
+        }
+
+        public async Task<BitbucketPageResponse<BitbucketPullRequestCommit>> GetCommits(BitbucketPullRequest pullRequest)
+        {
+            string RequestUri = $"{this.GetBaseUri(pullRequest)}/commits";
+
+            return await this.client.GetAsync<BitbucketPageResponse<BitbucketPullRequestCommit>>(RequestUri);
         }
 
         public async Task<HttpResponseMessage> SetReviewerStatus(BitbucketPullRequest pullRequest, BitbucketParticipant reviewer)
@@ -40,14 +47,14 @@ namespace Gideon.Api.Integrations
 
             string RequestUri = $"{this.GetBaseUri(pullRequest)}/participants/{reviewer.User.Slug}";
 
-            return await this.atlassianClient.Client.PutAsync(RequestUri, new JsonContent<BitbucketParticipant>(reviewer));
+            return await this.client.PutAsync(RequestUri, new JsonContent<BitbucketParticipant>(reviewer));
         }
 
         public async Task<BitbucketMergeStatus> TestMerge(BitbucketPullRequest pullRequest)
         {
             string RequestUri = $"{this.GetBaseUri(pullRequest)}/merge";
 
-            return await this.atlassianClient.Client.GetAsync<BitbucketMergeStatus>(RequestUri);
+            return await this.client.GetAsync<BitbucketMergeStatus>(RequestUri);
         }
 
         private string GetBaseUri(BitbucketPullRequest pullRequest)

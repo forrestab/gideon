@@ -9,6 +9,7 @@ namespace Gideon.Api.Integrations
     {
         Task<HttpResponseMessage> AddComment(BitbucketPullRequest pullRequest, BitbucketComment comment);
         Task<HttpResponseMessage> AddReviewer(BitbucketPullRequest pullRequest, BitbucketParticipant reviewer);
+        Task<BitbucketPageResponse<BitbucketPullRequestCommit>> GetCommits(BitbucketPullRequest pullRequest);
         Task<HttpResponseMessage> SetReviewerStatus(BitbucketPullRequest pullRequest, BitbucketParticipant reviewer);
         Task<BitbucketMergeStatus> TestMerge(BitbucketPullRequest pullRequest);
     }
