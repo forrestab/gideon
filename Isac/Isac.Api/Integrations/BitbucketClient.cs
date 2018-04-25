@@ -1,7 +1,9 @@
-﻿using Isac.Api.Http;
+﻿using Isac.Api.Configuration;
+using Isac.Api.Http;
 using Isac.Api.Models;
 using Isac.Api.Utilities;
 using Isac.WebHooks.Receivers.BitbucketServer.Models;
+using Microsoft.Extensions.Options;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -11,9 +13,9 @@ namespace Isac.Api.Integrations
     {
         private readonly HttpClient client;
 
-        public BitbucketClient(HttpClient client)
+        public BitbucketClient(HttpClient client, IOptions<IntegrationsConfig> config)
         {
-            this.client = client;
+            this.client = client.Configure(config.Value.Bitbucket);
         }
 
         public async Task<HttpResponseMessage> AddComment(BitbucketPullRequest pullRequest, BitbucketComment comment)
