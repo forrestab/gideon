@@ -8,10 +8,10 @@ namespace Isac.Api.Http
 {
     public static class HttpClientExtensions
     {
-        public static HttpClient ConfigureWithBasicAuthentication(this HttpClient client, ClientConfig config)
+        public static HttpClient Configure(this HttpClient client, ClientConfig config)
         {
             client.BaseAddress = config.BaseUrl;
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", config.Credentials.FormatForBasicAuth());
+            client.DefaultRequestHeaders.Authorization = HttpClientExtensions.GetAuthHeader(config);
             client.DefaultRequestHeaders.Add("Accept", "application/json");
 
             return client;
@@ -42,6 +42,18 @@ namespace Isac.Api.Http
             Response.EnsureSuccessStatusCode();
 
             return await Response.Content.ReadAsJsonAsync<T>();
+        }
+
+        private static AuthenticationHeaderValue GetAuthHeader(ClientConfig config)
+        {
+            if (config.HasAccessToken)
+            {
+                return new AuthenticationHeaderValue("Bearer", config.AccessToken);
+            }
+            else
+            {
+                return new AuthenticationHeaderValue("Basic", config.Credentials.FormatForBasicAuth());
+            }
         }
     }
 }

@@ -14,12 +14,12 @@ namespace Isac.Api.Integrations
 
         public FishEyeClient(HttpClient client, IOptions<IntegrationsConfig> config)
         {
-            this.client = client.ConfigureWithBasicAuthentication(config.Value.FishEye);
+            this.client = client.Configure(config.Value.FishEye);
         }
 
         public async Task<FishEyeChangesets> GetReviewsForChangesets(string repositoryKey, List<string> commitIds)
         {
-            string RequestUri = $"search-v1/reviewsForChangesets/{repositoryKey}";
+            string RequestUri = $"/search-v1/reviewsForChangesets/{repositoryKey}";
             List<KeyValuePair<string, string>> ChangesetIds = new List<KeyValuePair<string, string>>();
 
             foreach (string CommitId in commitIds)
