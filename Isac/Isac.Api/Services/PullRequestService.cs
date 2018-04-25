@@ -2,13 +2,15 @@
 using Isac.Api.Models;
 using Isac.Api.Models.FishEye;
 using Isac.Api.Properties;
+using Isac.Api.Settings;
 using Isac.Api.Utilities;
 using Isac.WebHooks.Receivers.BitbucketServer.Models;
 using Isac.WebHooks.Receivers.BitbucketServer.Models.Enums;
 using Isac.WebHooks.Receivers.BitbucketServer.Models.Notifications;
+using Microsoft.Extensions.Options;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Isac.Api.Services
 {
@@ -16,11 +18,14 @@ namespace Isac.Api.Services
     {
         private readonly IBitbucketClient bitbucketClient;
         private readonly IFishEyeClient fishEyeClient;
+        private readonly IntegrationSettings settings;
 
-        public PullRequestService(IBitbucketClient bitbucketClient, IFishEyeClient fishEyeClient)
+        public PullRequestService(IBitbucketClient bitbucketClient, IFishEyeClient fishEyeClient, 
+            IOptions<IntegrationSettings> settings)
         {
             this.bitbucketClient = bitbucketClient;
             this.fishEyeClient = fishEyeClient;
+            this.settings = settings.Value;
         }
 
         public async Task OnOpenedHandlerAsync(PullRequestOpenedNotification notification)
@@ -36,9 +41,8 @@ namespace Isac.Api.Services
                 {
                     User = new BitbucketUser()
                     {
-                        // TODO, pull this from configuration
-                        Name = "isac-bot",
-                        Slug = "isac-bot"
+                        Name = this.settings.Bitbucket.Credentials.UserName,
+                        Slug = this.settings.Bitbucket.Credentials.UserName
                     },
                     IsApproved = false,
                     Status = BitbucketStatus.NeedsWork
@@ -66,8 +70,7 @@ namespace Isac.Api.Services
                 {
                     User = new BitbucketUser()
                     {
-                        // TODO, pull this from configuration
-                        Name = "isac-bot"
+                        Name = this.settings.Bitbucket.Credentials.UserName
                     },
                     Role = BitbucketRole.Reviewer
                 });
@@ -78,8 +81,7 @@ namespace Isac.Api.Services
         {
             return reviewers.Exists(reviewer =>
             {
-                // TODO, pull bot name from configuration
-                return reviewer.User.Name.Equals("isac-bot");
+                return reviewer.User.Name.Equals(this.settings.Bitbucket.Credentials.UserName);
             });
         }
 
