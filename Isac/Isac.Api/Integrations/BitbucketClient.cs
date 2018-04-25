@@ -63,7 +63,7 @@ namespace Isac.Api.Integrations
         {
             Guard.AgainstNullArgument<BitbucketPullRequest>(nameof(pullRequest), pullRequest);
 
-            return $"/projects/{pullRequest.ToReference.Repository.Project.Key}/repos/{pullRequest.ToReference.Repository.Slug}/pull-requests/{pullRequest.Id}";
+            return $"projects/{pullRequest.ToReference.Repository.Project.Key}/repos/{pullRequest.ToReference.Repository.Slug}/pull-requests/{pullRequest.Id}";
         }
     }
 }

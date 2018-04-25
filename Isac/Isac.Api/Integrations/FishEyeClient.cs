@@ -19,7 +19,7 @@ namespace Isac.Api.Integrations
 
         public async Task<FishEyeChangesets> GetReviewsForChangesets(string repositoryKey, List<string> commitIds)
         {
-            string RequestUri = $"/search-v1/reviewsForChangesets/{repositoryKey}";
+            string RequestUri = $"search-v1/reviewsForChangesets/{repositoryKey}";
             List<KeyValuePair<string, string>> ChangesetIds = new List<KeyValuePair<string, string>>();
 
             foreach (string CommitId in commitIds)
