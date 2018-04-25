@@ -1,10 +1,24 @@
-﻿using System.Net.Http;
+﻿using Isac.Api.Settings;
+using System;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Isac.Api.Http
 {
     public static class HttpClientExtensions
     {
+        public static HttpClient ConfigureWithBasicAuthentication(this HttpClient client, Uri baseAddress, CredentialSettings credentials)
+        {
+            client.BaseAddress = baseAddress;
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
+                    Convert.ToBase64String(Encoding.ASCII.GetBytes(credentials.AsBasicAuthorization())));
+            client.DefaultRequestHeaders.Add("Accept", "application/json");
+
+            return client;
+        }
+
         public static async Task<T> GetAsync<T>(this HttpClient client, string requestUri)
         {
             HttpResponseMessage Response = await client.GetAsync(requestUri);

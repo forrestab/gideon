@@ -1,7 +1,10 @@
 ﻿using Isac.Api.Http;
 using Isac.Api.Models;
+using Isac.Api.Settings;
 using Isac.Api.Utilities;
 using Isac.WebHooks.Receivers.BitbucketServer.Models;
+using Microsoft.Extensions.Options;
+using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -11,9 +14,11 @@ namespace Isac.Api.Integrations
     {
         private readonly HttpClient client;
 
-        public BitbucketClient(HttpClient client)
+        public BitbucketClient(HttpClient client, IOptions<IntegrationSettings> integrationSettings)
         {
-            this.client = client;
+            //this.client = client.ConfigureWithBasicAuthentication(new Uri($"{integrationSettings.Value.Bitbucket.BaseUrl.OriginalString}/rest/api/1.0/"),
+            this.client = client.ConfigureWithBasicAuthentication(new Uri($"{integrationSettings.Value.Bitbucket.BaseUrl.OriginalString}/rest"),
+                integrationSettings.Value.Bitbucket.Credentials);
         }
 
         public async Task<HttpResponseMessage> AddComment(BitbucketPullRequest pullRequest, BitbucketComment comment)
@@ -61,7 +66,7 @@ namespace Isac.Api.Integrations
         {
             Guard.AgainstNullArgument<BitbucketPullRequest>(nameof(pullRequest), pullRequest);
 
-            return $"projects/{pullRequest.ToReference.Repository.Project.Key}/repos/{pullRequest.ToReference.Repository.Slug}/pull-requests/{pullRequest.Id}";
+            return $"/projects/{pullRequest.ToReference.Repository.Project.Key}/repos/{pullRequest.ToReference.Repository.Slug}/pull-requests/{pullRequest.Id}";
         }
     }
 }

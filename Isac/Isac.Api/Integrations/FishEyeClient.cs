@@ -1,5 +1,8 @@
 ﻿using Isac.Api.Http;
 using Isac.Api.Models.FishEye;
+using Isac.Api.Settings;
+using Microsoft.Extensions.Options;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -10,9 +13,10 @@ namespace Isac.Api.Integrations
     {
         private readonly HttpClient client;
 
-        public FishEyeClient(HttpClient client)
+        public FishEyeClient(HttpClient client, IOptions<IntegrationSettings> integrationSettings)
         {
-            this.client = client;
+            this.client = client.ConfigureWithBasicAuthentication(new Uri($"{integrationSettings.Value.Crucible.BaseUrl.OriginalString}/rest-service-fe/"),
+                integrationSettings.Value.Crucible.Credentials);
         }
 
         public async Task<FishEyeChangesets> GetReviewsForChangesets(string repositoryKey, List<string> commitIds)
