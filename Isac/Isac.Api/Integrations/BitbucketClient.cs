@@ -1,6 +1,6 @@
 ﻿using Isac.Api.Http;
 using Isac.Api.Models;
-using Isac.Api.Settings;
+using Isac.Api.Configuration;
 using Isac.Api.Utilities;
 using Isac.WebHooks.Receivers.BitbucketServer.Models;
 using Microsoft.Extensions.Options;
@@ -14,11 +14,9 @@ namespace Isac.Api.Integrations
     {
         private readonly HttpClient client;
 
-        public BitbucketClient(HttpClient client, IOptions<IntegrationSettings> integrationSettings)
+        public BitbucketClient(HttpClient client, IOptions<IntegrationsConfig> config)
         {
-            //this.client = client.ConfigureWithBasicAuthentication(new Uri($"{integrationSettings.Value.Bitbucket.BaseUrl.OriginalString}/rest/api/1.0/"),
-            this.client = client.ConfigureWithBasicAuthentication(new Uri($"{integrationSettings.Value.Bitbucket.BaseUrl.OriginalString}/rest"),
-                integrationSettings.Value.Bitbucket.Credentials);
+            this.client = client.ConfigureWithBasicAuthentication(config.Value.Bitbucket);
         }
 
         public async Task<HttpResponseMessage> AddComment(BitbucketPullRequest pullRequest, BitbucketComment comment)

@@ -2,7 +2,7 @@
 using Isac.Api.Models;
 using Isac.Api.Models.FishEye;
 using Isac.Api.Properties;
-using Isac.Api.Settings;
+using Isac.Api.Configuration;
 using Isac.Api.Utilities;
 using Isac.WebHooks.Receivers.BitbucketServer.Models;
 using Isac.WebHooks.Receivers.BitbucketServer.Models.Enums;
@@ -18,10 +18,10 @@ namespace Isac.Api.Services
     {
         private readonly IBitbucketClient bitbucketClient;
         private readonly IFishEyeClient fishEyeClient;
-        private readonly IntegrationSettings settings;
+        private readonly IntegrationsConfig settings;
 
         public PullRequestService(IBitbucketClient bitbucketClient, IFishEyeClient fishEyeClient, 
-            IOptions<IntegrationSettings> settings)
+            IOptions<IntegrationsConfig> settings)
         {
             this.bitbucketClient = bitbucketClient;
             this.fishEyeClient = fishEyeClient;
