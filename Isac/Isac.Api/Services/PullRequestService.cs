@@ -17,13 +17,15 @@ namespace Isac.Api.Services
     public class PullRequestService : IPullRequestService
     {
         private readonly IBitbucketClient bitbucketClient;
+        private readonly ICrucibleClient crucibleClient;
         private readonly IFishEyeClient fishEyeClient;
         private readonly IntegrationsConfig settings;
 
-        public PullRequestService(IBitbucketClient bitbucketClient, IFishEyeClient fishEyeClient, 
+        public PullRequestService(IBitbucketClient bitbucketClient, ICrucibleClient crucibleClient, IFishEyeClient fishEyeClient, 
             IOptions<IntegrationsConfig> settings)
         {
             this.bitbucketClient = bitbucketClient;
+            this.crucibleClient = crucibleClient;
             this.fishEyeClient = fishEyeClient;
             this.settings = settings.Value;
         }
@@ -59,6 +61,8 @@ namespace Isac.Api.Services
 
             // check other criteria
             await this.AreAllCommitsReviewed(notification.PullRequest);
+            // check for closed review
+            // check for 2 reviewers in complete status
         }
 
         private async Task AddBotAsReviewer(PullRequestOpenedNotification notification)

@@ -26,6 +26,7 @@ namespace Isac.Api
 
             services.Configure<IntegrationsConfig>(this.Configuration.GetSection("Integrations"));
             services.AddHttpClient<IBitbucketClient, BitbucketClient>();
+            services.AddHttpClient<ICrucibleClient, CrucibleClient>();
             services.AddHttpClient<IFishEyeClient, FishEyeClient>();
             services.AddScoped<IPullRequestService, PullRequestService>();
         }
