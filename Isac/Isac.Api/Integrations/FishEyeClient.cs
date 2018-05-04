@@ -14,7 +14,7 @@ namespace Isac.Api.Integrations
 
         public FishEyeClient(HttpClient client, IOptions<IntegrationsConfig> config)
         {
-            this.client = client.Configure(config.Value.FishEye);
+            this.client = client.Configure<BaseUrlsConfig>(config.Value.FishEye);
         }
 
         public async Task<FishEyeChangesets> GetReviewsForChangesets(string repositoryKey, List<string> commitIds)
