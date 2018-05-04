@@ -1,8 +1,11 @@
-﻿using Isac.Api.Integrations;
+﻿using Isac.Api.Configuration;
+using Isac.Api.Extensions;
+using Isac.Api.Integrations;
 using Isac.Api.Models;
+using Isac.Api.Models.Crucible;
+using Isac.Api.Models.Crucible.Enums;
 using Isac.Api.Models.FishEye;
 using Isac.Api.Properties;
-using Isac.Api.Configuration;
 using Isac.Api.Utilities;
 using Isac.WebHooks.Receivers.BitbucketServer.Models;
 using Isac.WebHooks.Receivers.BitbucketServer.Models.Enums;
@@ -60,9 +63,13 @@ namespace Isac.Api.Services
             }
 
             // check other criteria
-            await this.AreAllCommitsReviewed(notification.PullRequest);
+            FishEyeChangesets Changesets = await this.FindReviewsByCommits(notification.PullRequest);
+
+            // check all commits are associated with a review
+            await this.AreAllCommitsReviewed(notification.PullRequest, Changesets);
             // check for closed review
             // check for 2 reviewers in complete status
+            await this.ValidateReviewConditions(notification.PullRequest, Changesets);            
         }
 
         private async Task AddBotAsReviewer(PullRequestOpenedNotification notification)
@@ -97,24 +104,21 @@ namespace Isac.Api.Services
             return Response.IsConflicted;
         }
 
-        private async Task<bool> AreAllCommitsReviewed(BitbucketPullRequest pullRequest)
+        private async Task<FishEyeChangesets> FindReviewsByCommits(BitbucketPullRequest pullRequest)
         {
             BitbucketPageResponse<BitbucketPullRequestCommit> Response = await this.bitbucketClient.GetCommits(pullRequest);
-            FishEyeChangesets Changesets;
 
-            if (Response.Values.Count <= 0)
-            {
-                return true;
-            }
-
-            Changesets = await this.fishEyeClient.GetReviewsForChangesets(pullRequest.FromReference.Repository.Slug, 
+            return await this.fishEyeClient.GetReviewsForChangesets(pullRequest.FromReference.Repository.Slug,
                 Response.Values.Select(s => s.Id).ToList());
+        }
 
-            List<FishEyeChangeset> ChangesetsMissingReviews = Changesets.Changesets.FindAll(c => c.Reviews.Count <= 0);
+        private async Task<bool> AreAllCommitsReviewed(BitbucketPullRequest pullRequest, FishEyeChangesets changesets)
+        {
+            List<FishEyeChangeset> ChangesetsMissingReviews = changesets.Changesets.FindAll(c => c.Reviews.Count <= 0);
 
             if (ChangesetsMissingReviews.Count > 0)
             {
-                // List commits that are not associated with a review
+                // list commits that are not associated with a review
                 await this.bitbucketClient.AddComment(pullRequest, new BitbucketComment()
                 {
                     Text = string.Format(Resources.PullRequest_CommitsNotAssociatedWithAReview, 
@@ -123,6 +127,71 @@ namespace Isac.Api.Services
             }
 
             return false;
+        }
+
+        private async Task ValidateReviewConditions(BitbucketPullRequest pullRequest, FishEyeChangesets changesets)
+        {
+            // find distinctive reviews from changesets
+            List<FishEyeReview> FishEyeReviews = new List<FishEyeReview>();
+            List<Problem> Problems;
+
+            foreach (FishEyeChangeset Changeset in changesets.Changesets)
+            {
+                FishEyeReviews.AddRange(Changeset.Reviews.GroupBy(g => g.ProjectKey).Select(r => r.First()));
+            }
+
+            // get details on the reviews
+            List<CrucibleReview> CrucibleReviews = new List<CrucibleReview>();
+
+            foreach (FishEyeReview Review in FishEyeReviews)
+            {
+                CrucibleReviews.Add(await this.crucibleClient.GetReviewDetails(Review.PermaId["id"].ToString()));
+            }
+
+            // check if all reviews are closed and have 2 completed reviewers
+            Problems = this.ValidateStateForAssociatedReviews(CrucibleReviews);
+            Problems = Problems.Merge(this.ValidateCompletedReviewersForAssociatedReviews(CrucibleReviews));
+
+            // if failure found, comment to the pr the problem, make sure to check both though
+            // @{PR Creator Name} + above messages + .
+            if (Problems.Count > 0)
+            {
+                await this.bitbucketClient.AddComment(pullRequest, new BitbucketComment()
+                {
+                    // TODO, move message to resources
+                    Text = $"@{pullRequest.Author.User.Name} please see below issues:\n\n{string.Join("\n", Problems.Select(s => $"* {s.Message}"))}"
+                });
+            }
+        }
+
+        private List<Problem> ValidateStateForAssociatedReviews(List<CrucibleReview> reviews)
+        {
+            return reviews
+                // TODO, pull the state from config
+                .Where(w => w.State != CrucibleReviewState.Closed)
+                .Select(s => new Problem()
+                {
+                    Key = s.PermanentId["id"].ToString(),
+                    ResourceUrl = this.settings.Crucible.Urls.Review,
+                    // TODO, move message to resources
+                    Message = "is not closed"
+                })
+                .ToList<Problem>();
+        }
+
+        private List<Problem> ValidateCompletedReviewersForAssociatedReviews(List<CrucibleReview> reviews)
+        {
+            return reviews
+                // TODO, pull the number of reviewers
+                .Where(w => w.Reviewers.Reviewers.Count(c => c.HasCompleted) < 2)
+                .Select(s => new Problem()
+                {
+                    Key = s.PermanentId["id"].ToString(),
+                    ResourceUrl = this.settings.Crucible.Urls.Review,
+                    // TODO, move messages to resources
+                    Message = "does not have at least 2 completed reviewers"
+                })
+                .ToList<Problem>();
         }
     }
 }
