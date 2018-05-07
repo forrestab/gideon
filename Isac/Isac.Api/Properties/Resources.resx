@@ -134,7 +134,7 @@
     <comment>0 = number of reviewers</comment>
   </data>
   <data name="PullRequest_ReviewStateValidation" xml:space="preserve">
-    <value>is not {0}</value>
+    <value>is not \"{0}\"</value>
     <comment>0 = review state</comment>
   </data>
 </root>

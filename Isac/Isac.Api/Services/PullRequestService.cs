@@ -22,14 +22,16 @@ namespace Isac.Api.Services
         private readonly IBitbucketClient bitbucketClient;
         private readonly ICrucibleClient crucibleClient;
         private readonly IFishEyeClient fishEyeClient;
-        private readonly IntegrationsConfig settings;
+        private readonly IntegrationsConfig integrations;
+        private readonly SettingsConfig settings;
 
         public PullRequestService(IBitbucketClient bitbucketClient, ICrucibleClient crucibleClient, IFishEyeClient fishEyeClient, 
-            IOptions<IntegrationsConfig> settings)
+            IOptions<IntegrationsConfig> integrations, IOptions<SettingsConfig> settings)
         {
             this.bitbucketClient = bitbucketClient;
             this.crucibleClient = crucibleClient;
             this.fishEyeClient = fishEyeClient;
+            this.integrations = integrations.Value;
             this.settings = settings.Value;
         }
 
@@ -46,8 +48,8 @@ namespace Isac.Api.Services
                 {
                     User = new BitbucketUser()
                     {
-                        Name = this.settings.Bitbucket.Credentials.UserName,
-                        Slug = this.settings.Bitbucket.Credentials.UserName
+                        Name = this.integrations.Bitbucket.Credentials.UserName,
+                        Slug = this.integrations.Bitbucket.Credentials.UserName
                     },
                     IsApproved = false,
                     Status = BitbucketStatus.NeedsWork
@@ -81,7 +83,7 @@ namespace Isac.Api.Services
                 {
                     User = new BitbucketUser()
                     {
-                        Name = this.settings.Bitbucket.Credentials.UserName
+                        Name = this.integrations.Bitbucket.Credentials.UserName
                     },
                     Role = BitbucketRole.Reviewer
                 });
@@ -92,7 +94,7 @@ namespace Isac.Api.Services
         {
             return reviewers.Exists(reviewer =>
             {
-                return reviewer.User.Name.Equals(this.settings.Bitbucket.Credentials.UserName);
+                return reviewer.User.Name.Equals(this.integrations.Bitbucket.Credentials.UserName);
             });
         }
 
@@ -159,8 +161,8 @@ namespace Isac.Api.Services
                 {
                     User = new BitbucketUser()
                     {
-                        Name = this.settings.Bitbucket.Credentials.UserName,
-                        Slug = this.settings.Bitbucket.Credentials.UserName
+                        Name = this.integrations.Bitbucket.Credentials.UserName,
+                        Slug = this.integrations.Bitbucket.Credentials.UserName
                     },
                     IsApproved = false,
                     Status = BitbucketStatus.NeedsWork
@@ -176,13 +178,13 @@ namespace Isac.Api.Services
         private List<Problem> ValidateStateForAssociatedReviews(List<CrucibleReview> reviews)
         {
             return reviews
-                // TODO, pull the state from config
-                .Where(w => w.State != CrucibleReviewState.Closed)
+                .Where(w => w.State != this.settings.PullRequests.ReviewConditions.ReviewState)
                 .Select(s => new Problem()
                 {
                     Key = s.PermanentId["id"].ToString(),
-                    ResourceUrl = this.settings.Crucible.Urls.Review,
-                    Message = string.Format(Resources.PullRequest_ReviewStateValidation, s.State.ToString())
+                    ResourceUrl = this.integrations.Crucible.Urls.Review,
+                    Message = string.Format(Resources.PullRequest_ReviewStateValidation,
+                        this.settings.PullRequests.ReviewConditions.ReviewState.ToString())
                 })
                 .ToList<Problem>();
         }
@@ -190,13 +192,13 @@ namespace Isac.Api.Services
         private List<Problem> ValidateCompletedReviewersForAssociatedReviews(List<CrucibleReview> reviews)
         {
             return reviews
-                // TODO, pull the number of reviewers
-                .Where(w => w.Reviewers.Reviewers.Count(c => c.HasCompleted) < 2)
+                .Where(w => w.Reviewers.Reviewers.Count(c => c.HasCompleted) < this.settings.PullRequests.ReviewConditions.ReviewerCount)
                 .Select(s => new Problem()
                 {
                     Key = s.PermanentId["id"].ToString(),
-                    ResourceUrl = this.settings.Crucible.Urls.Review,
-                    Message = string.Format(Resources.PullRequest_ReviewCompletedReviewers, 2)
+                    ResourceUrl = this.integrations.Crucible.Urls.Review,
+                    Message = string.Format(Resources.PullRequest_ReviewCompletedReviewers, 
+                        this.settings.PullRequests.ReviewConditions.ReviewerCount)
                 })
                 .ToList<Problem>();
         }
