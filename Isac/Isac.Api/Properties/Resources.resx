@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="PullRequest_CommitsNotAssociatedWithAReview" xml:space="preserve">
-    <value>The following commits are not associated with a reveiw:\n\n{0}</value>
+    <value>The following commits are not associated with a review:\n\n{0}</value>
     <comment>0 = list of commit ids</comment>
   </data>
   <data name="PullRequest_MergeConflictResolution" xml:space="preserve">
