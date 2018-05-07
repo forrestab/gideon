@@ -153,13 +153,22 @@ namespace Isac.Api.Services
             Problems = Problems.Merge(this.ValidateCompletedReviewersForAssociatedReviews(CrucibleReviews));
 
             // if failure found, comment to the pr the problem, make sure to check both though
-            // @{PR Creator Name} + above messages + .
             if (Problems.Count > 0)
             {
+                await this.bitbucketClient.SetReviewerStatus(pullRequest, new BitbucketParticipant()
+                {
+                    User = new BitbucketUser()
+                    {
+                        Name = this.settings.Bitbucket.Credentials.UserName,
+                        Slug = this.settings.Bitbucket.Credentials.UserName
+                    },
+                    IsApproved = false,
+                    Status = BitbucketStatus.NeedsWork
+                });
                 await this.bitbucketClient.AddComment(pullRequest, new BitbucketComment()
                 {
-                    // TODO, move message to resources
-                    Text = $"@{pullRequest.Author.User.Name} please see below issues:\n\n{string.Join("\n", Problems.Select(s => $"* {s.Message}"))}"
+                    Text = string.Format(Resources.PullRequest_NeedsWorkReviewConditions, pullRequest.Author.User.Name, 
+                        string.Join("\n", Problems.Select(s => $"* {s.Message}")))
                 });
             }
         }
@@ -173,8 +182,7 @@ namespace Isac.Api.Services
                 {
                     Key = s.PermanentId["id"].ToString(),
                     ResourceUrl = this.settings.Crucible.Urls.Review,
-                    // TODO, move message to resources
-                    Message = "is not closed"
+                    Message = string.Format(Resources.PullRequest_ReviewStateValidation, s.State.ToString())
                 })
                 .ToList<Problem>();
         }
@@ -188,8 +196,7 @@ namespace Isac.Api.Services
                 {
                     Key = s.PermanentId["id"].ToString(),
                     ResourceUrl = this.settings.Crucible.Urls.Review,
-                    // TODO, move messages to resources
-                    Message = "does not have at least 2 completed reviewers"
+                    Message = string.Format(Resources.PullRequest_ReviewCompletedReviewers, 2)
                 })
                 .ToList<Problem>();
         }
