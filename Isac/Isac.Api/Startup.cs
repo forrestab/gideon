@@ -25,7 +25,9 @@ namespace Isac.Api
                 .AddBitbucketWebHooks();
 
             services.Configure<IntegrationsConfig>(this.Configuration.GetSection("Integrations"));
+            services.Configure<SettingsConfig>(this.Configuration.GetSection("Settings"));
             services.AddHttpClient<IBitbucketClient, BitbucketClient>();
+            services.AddHttpClient<ICrucibleClient, CrucibleClient>();
             services.AddHttpClient<IFishEyeClient, FishEyeClient>();
             services.AddScoped<IPullRequestService, PullRequestService>();
         }

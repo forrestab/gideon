@@ -8,10 +8,11 @@ namespace Isac.Api.Http
 {
     public static class HttpClientExtensions
     {
-        public static HttpClient Configure(this HttpClient client, ClientConfig config)
+        public static HttpClient Configure<T>(this HttpClient client, ClientConfig<T> config)
+            where T : BaseUrlsConfig
         {
-            client.BaseAddress = config.BaseUrl;
-            client.DefaultRequestHeaders.Authorization = HttpClientExtensions.GetAuthHeader(config);
+            client.BaseAddress = config.Urls.Api;
+            client.DefaultRequestHeaders.Authorization = HttpClientExtensions.GetAuthHeader<T>(config);
             client.DefaultRequestHeaders.Add("Accept", "application/json");
 
             return client;
@@ -44,7 +45,7 @@ namespace Isac.Api.Http
             return await Response.Content.ReadAsJsonAsync<T>();
         }
 
-        private static AuthenticationHeaderValue GetAuthHeader(ClientConfig config)
+        private static AuthenticationHeaderValue GetAuthHeader<T>(ClientConfig<T> config)
         {
             if (config.HasAccessToken)
             {

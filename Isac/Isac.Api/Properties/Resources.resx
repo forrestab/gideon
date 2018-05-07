@@ -125,4 +125,16 @@
     <value>This pull request contains conflicts, please follow the below steps to resolve them.\n\n**Step 1.** Make sure `{0}` is updated locally.\n\n```sh\ngit checkout {0}\ngit pull\n```\n\n**Step 2.** Checkout `{1}` and pull `{0}` in locally. This will try to merge and will reveal all of the conflicts.\n\n```sh\ngit checkout {1}\ngit pull origin {0}\n```\n\n**Step 3.** Resolve conflicts, add and commit the changes and push them to remote.\n\n```sh\ngit add &lt;files&gt;\ngit commit -m 'commit message'\ngit push origin {1}\n```\n\nChecking the pull request, you should see that its still open with no merge conflicts.</value>
     <comment>0 = destination, 1 = source</comment>
   </data>
+  <data name="PullRequest_NeedsWorkReviewConditions" xml:space="preserve">
+    <value>@{0} I marked this pull request as \"Needs Work\" because of the following issues:\n\n{1}</value>
+    <comment>0 = pr author, 1 = list of issues</comment>
+  </data>
+  <data name="PullRequest_ReviewCompletedReviewers" xml:space="preserve">
+    <value>does not have at least {0} completed reviewers</value>
+    <comment>0 = number of reviewers</comment>
+  </data>
+  <data name="PullRequest_ReviewStateValidation" xml:space="preserve">
+    <value>is not \"{0}\"</value>
+    <comment>0 = review state</comment>
+  </data>
 </root>

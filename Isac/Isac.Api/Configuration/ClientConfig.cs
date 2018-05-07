@@ -3,9 +3,9 @@ using System.Net;
 
 namespace Isac.Api.Configuration
 {
-    public class ClientConfig
+    public class ClientConfig<T>
     {
-        public Uri BaseUrl { get; set; }
+        public T Urls { get; set; }
         public NetworkCredential Credentials { get; set; }
         public string AccessToken { get; set; }
 

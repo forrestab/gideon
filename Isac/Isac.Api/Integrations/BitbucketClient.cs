@@ -15,7 +15,7 @@ namespace Isac.Api.Integrations
 
         public BitbucketClient(HttpClient client, IOptions<IntegrationsConfig> config)
         {
-            this.client = client.Configure(config.Value.Bitbucket);
+            this.client = client.Configure<BaseUrlsConfig>(config.Value.Bitbucket);
         }
 
         public async Task<HttpResponseMessage> AddComment(BitbucketPullRequest pullRequest, BitbucketComment comment)

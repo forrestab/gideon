@@ -77,5 +77,32 @@ namespace Isac.Api.Properties {
                 return ResourceManager.GetString("PullRequest_MergeConflictResolution", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to @{0} I marked this pull request as \&quot;Needs Work\&quot; because of the following issues:\n\n{1}.
+        /// </summary>
+        internal static string PullRequest_NeedsWorkReviewConditions {
+            get {
+                return ResourceManager.GetString("PullRequest_NeedsWorkReviewConditions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to does not have at least {0} completed reviewers.
+        /// </summary>
+        internal static string PullRequest_ReviewCompletedReviewers {
+            get {
+                return ResourceManager.GetString("PullRequest_ReviewCompletedReviewers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to is not {0}.
+        /// </summary>
+        internal static string PullRequest_ReviewStateValidation {
+            get {
+                return ResourceManager.GetString("PullRequest_ReviewStateValidation", resourceCulture);
+            }
+        }
     }
 }
