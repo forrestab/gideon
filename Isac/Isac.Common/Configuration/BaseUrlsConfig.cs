@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Isac.Common.Extensions;
+using System;
 
 namespace Isac.Common.Configuration
 {

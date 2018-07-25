@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace Isac.Common
+namespace Isac.Common.Extensions
 {
     public static class StringExtensions
     {

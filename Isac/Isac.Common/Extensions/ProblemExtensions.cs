@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Isac.Common
+namespace Isac.Common.Extensions
 {
     public static class ProblemExtensions
     {

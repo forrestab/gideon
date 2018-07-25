@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Isac.Common
+namespace Isac.Common.Extensions
 {
     public static class UriExtensions
     {

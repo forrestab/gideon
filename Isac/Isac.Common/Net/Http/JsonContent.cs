@@ -1,4 +1,4 @@
-﻿using Isac.Common;
+﻿using Isac.Common.Extensions;
 using Newtonsoft.Json;
 using System.Net.Http;
 using System.Text;

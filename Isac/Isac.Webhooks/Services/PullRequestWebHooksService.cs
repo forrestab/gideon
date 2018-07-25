@@ -1,5 +1,6 @@
 ﻿using Isac.Common;
 using Isac.Common.Configuration;
+using Isac.Common.Extensions;
 using Isac.Common.Models;
 using Isac.Integrations.Atlassian.Bitbucket;
 using Isac.Integrations.Atlassian.Bitbucket.Models;
